@@ -1,0 +1,12 @@
+{
+  "name": "data-dog",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "./test/runner.sh"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
