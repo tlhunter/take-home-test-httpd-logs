@@ -1,5 +1,7 @@
 #!/usr/bin/env node
 
+'use strict';
+
 const assert = require('assert');
 
 const Statistics = require('../statistics.js');

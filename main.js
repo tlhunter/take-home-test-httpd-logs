@@ -1,5 +1,7 @@
 #!/usr/bin/env node
 
+'use strict';
+
 const Monitor = require('./monitor.js');
 
 const monitor = new Monitor({

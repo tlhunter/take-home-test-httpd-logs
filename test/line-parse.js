@@ -1,5 +1,7 @@
 #!/usr/bin/env node
 
+'use strict';
+
 const Line = require('../line.js');
 const assert = require('assert');
 

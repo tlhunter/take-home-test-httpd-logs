@@ -1,3 +1,5 @@
+'use strict';
+
 class Statistics {
   constructor() {
     this.total = 0;

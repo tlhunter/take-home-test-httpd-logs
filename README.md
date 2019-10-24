@@ -15,5 +15,5 @@ The arguments are both optional.
 To test, run the following:
 
 ```sh
-$ npm run test
+$ npm test
 ```
