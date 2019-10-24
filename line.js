@@ -80,7 +80,16 @@ class Line {
     this.request_section = this.request_path.substr(
       0,
       this.request_path.indexOf('/', 1)
-    ) || this.request_path; // TODO: /foo?bar=1
+    ) || this.request_path;
+
+    // There's an edge case if URL has a single segment and query params
+    // Since there's no second slash
+    if (this.request_section.includes('?')) {
+      this.request_section = this.request_section.substr(
+        0,
+        this.request_section.indexOf('?')
+      );
+    }
   }
 }
 

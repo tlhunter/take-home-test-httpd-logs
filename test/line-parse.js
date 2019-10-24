@@ -28,11 +28,21 @@ const assert = require('assert');
 }
 
 {
-  const line = new Line('127.0.0.1 - mary [09/May/2018:16:00:42 +0000] "POST /api/user HTTP/1.0" 503 12');
+  const line = new Line('127.0.0.1 - mary [09/May/2018:16:00:42 +0000] "POST /api/user?foo=bar HTTP/1.0" 503 12');
   assert.strictEqual(line.request_section, '/api');
 }
 
 {
   const line = new Line('127.0.0.1 - james [09/May/2018:16:00:39 +0000] "GET /report HTTP/1.0" 200 123');
   assert.strictEqual(line.request_section, '/report');
+}
+
+{
+  const line = new Line('127.0.0.1 - james [09/May/2018:16:00:39 +0000] "GET /report?foo HTTP/1.0" 200 123');
+  assert.strictEqual(line.request_section, '/report');
+}
+
+{
+  const line = new Line('127.0.0.1 - james [09/May/2018:16:00:39 +0000] "GET /report/\\"hello\\" HTTP/1.0" 200 123');
+  assert.strictEqual(line.request_path, '/report/\\"hello\\"');
 }
