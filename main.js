@@ -5,7 +5,7 @@
 const Monitor = require('./monitor.js');
 
 const monitor = new Monitor({
-  threshold_rps: process.argv[3],
+  threshold_rps: Number(process.argv[3]),
   log_path: process.argv[2]
 });
 

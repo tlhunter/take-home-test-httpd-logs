@@ -4,7 +4,15 @@ const fs = require('fs');
 
 const Statistics = require('./statistics.js');
 const Line = require('./line.js');
-const POLL = 1_000;
+
+const DEFAULT_THRESHOLD_RPS = 10;
+const DEFAULT_LOG_PATH = '/tmp/access.log';
+const POLL_SECONDS = 10;
+const ALERT_RANGE_SECONDS = 2 * 60;
+
+const COLOR_RED = '\x1b[31m';
+const COLOR_CYAN = '\x1b[36m';
+const COLOR_RESET = '\x1b[0m';
 
 class Monitor {
   #threshold_rps;
@@ -15,9 +23,13 @@ class Monitor {
   #last_poll_buffer = null;
   #global_stats;
 
+  #alert_mode = false;
+  #alert_ring_buffer = new Array(Math.ceil(ALERT_RANGE_SECONDS / POLL_SECONDS)).fill(0);
+  #alert_ring_cursor = 0;
+
   constructor(opts = {}) {
-    this.#threshold_rps = opts.threshold_rps || 10;
-    this.#log_path = opts.log_path || '/tmp/access.log';
+    this.#threshold_rps = opts.threshold_rps || DEFAULT_THRESHOLD_RPS;
+    this.#log_path = opts.log_path || DEFAULT_LOG_PATH;
 
     this.#global_stats = new Statistics();
   }
@@ -26,7 +38,7 @@ class Monitor {
     this.stop();
     this.#watcher = fs.watchFile(
       this.#log_path,
-      {interval: POLL},
+      {interval: POLL_SECONDS * 1_000},
       this._fileChangeHandler.bind(this)
     );
 
@@ -56,6 +68,7 @@ class Monitor {
       const hits = buffer.toString()
         .trim()
         .split('\n');
+
       const batch = new Statistics();
 
       for (let hit of hits) {
@@ -63,6 +76,8 @@ class Monitor {
         this.#global_stats.track(line);
         batch.track(line);
       }
+
+      this._checkAlerts(hits.length);
 
       this.#global_stats.print('Global');
       batch.print('Batch');
@@ -78,12 +93,35 @@ class Monitor {
     this.#watcher.close();
     this.#watcher = null;
 
+    this.#alert_mode = false;
+
     fs.close(this.#fd, (err) => {
       if (err) {
         throw err;
       }
     });
     this.#fd = null;
+  }
+
+  _checkAlerts(alert_count) {
+    if (this.#alert_ring_cursor >= this.#alert_ring_buffer.length) {
+      this.#alert_ring_cursor = 0;
+    }
+
+    this.#alert_ring_buffer[this.#alert_ring_cursor] = alert_count;
+
+    this.#alert_ring_cursor++;
+
+    const recent_hits = this.#alert_ring_buffer.reduce((a, b) => a + b);
+    const rps = recent_hits / this.#alert_ring_buffer.length / POLL_SECONDS;
+
+    if (rps > this.#threshold_rps) {
+      this.#alert_mode = true;
+      console.log(`${COLOR_RED}High traffic generated an alert - hits = ${recent_hits} (${rps.toFixed(1)} r/s), triggered at ${(new Date()).toLocaleTimeString()}${COLOR_RESET}`);
+    } else if (this.#alert_mode) {
+      this.#alert_mode = false;
+      console.log(`${COLOR_CYAN}High traffic has passed${COLOR_RESET}`);
+    }
   }
 }
 
