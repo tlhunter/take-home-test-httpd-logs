@@ -14,11 +14,13 @@ class Statistics {
     this.hosts = new Map();
   }
 
-  hit(line/*: Line*/) {
+  track(line/*: Line*/) {
     this.total++;
 
     if (line.request_method in this.methods) {
       this.methods[line.request_method]++;
+    } else {
+      console.error(`UNKNOWN METHOD: ${line.request_method}`);
     }
 
     if (!this.sections.has(line.request_section)) {
@@ -48,6 +50,36 @@ class Statistics {
       );
     }
   }
+
+  print(title) {
+    console.log();
+    console.log(`### ${title} ###`);
+    printCols('Total Hits', this.total);
+
+    console.log('Methods:');
+    for (let key in this.methods) {
+      printCols(key, this.methods[key]);
+    }
+
+    console.log('Sections:');
+    for (let [key, value] of this.sections.entries()) {
+      printCols(key, value);
+    }
+
+    console.log('Users:');
+    for (let [key, value] of this.users.entries()) {
+      printCols(key, value);
+    }
+
+    console.log('Hosts:');
+    for (let [key, value] of this.hosts.entries()) {
+      printCols(key, value);
+    }
+  }
+}
+
+function printCols(left, right) {
+  console.log(`  \x1b[32m${left.padEnd(12, ' ')}\x1b[0m\t${right}`);
 }
 
 module.exports = Statistics;

@@ -7,8 +7,6 @@ const monitor = new Monitor({
   log_path: process.argv[2]
 });
 
-console.log(monitor);
-
 monitor.start((err) => {
   if (err) {
     console.error(err);
