@@ -4,8 +4,8 @@
 
 const test = require('tape');
 
-const Statistics = require('../statistics.js');
-const Hit = require('../hit.js');
+const Statistics = require('../lib/statistics.js');
+const Hit = require('../lib/hit.js');
 
 test('aggregate statistics', (t) => {
   const stat = new Statistics();

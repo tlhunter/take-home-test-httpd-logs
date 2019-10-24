@@ -2,7 +2,7 @@
 
 'use strict';
 
-const Monitor = require('./monitor.js');
+const Monitor = require('./lib/monitor.js');
 
 const monitor = new Monitor({
   threshold_rps: Number(process.argv[3]),

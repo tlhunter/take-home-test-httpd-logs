@@ -4,13 +4,13 @@
 
 const test = require('tape');
 
-const Monitor = require('../monitor.js');
-
-const monitor = new Monitor({
-  threshold_rps: 3
-});
+const Monitor = require('../lib/monitor.js');
 
 test('test high traffic alert threshold', (t) => {
+  const monitor = new Monitor({
+    threshold_rps: 3
+  });
+
   for (let i = 0; i < 12; i++) {
     // _checkAlerts() is called every 10 seconds
     // so we send 30 alerts to average 3 per second

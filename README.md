@@ -11,7 +11,7 @@ For basic usage just execute the `main.js` script:
 $ ./main.js <PATH_TO_LOGS=/tmp/access.log> <RPC_WARN_LIMIT=10>
 ```
 
-The arguments are both optional.
+Both arguments are optional.
 
 To test, run the following:
 
@@ -21,21 +21,21 @@ $ npm test
 ```
 
 
-## Try it Out
+## Sample Run
 
-First, make a local access log file:
+First, make a local `access.log` file:
 
 ```sh
 $ touch access.log
 ```
 
-Next, run the tool with an RPS threshold of 2:
+Next, run the tool with an RPS (Requests per Second) threshold of 2:
 
 ```sh
 $ ./main.js access.log 2
 ```
 
-In another tab, continuously generate 1 request per second:
+In another tab, continuously generate 1 RPS:
 
 ```sh
 $ watch -n1 ./trigger-1.sh
@@ -43,18 +43,20 @@ $ watch -n1 ./trigger-1.sh
 
 This can run for a while and you'll see data displayed in the main application.
 
-In a third tab, go ahead and generate 4 requests per second:
+In a third tab, go ahead and generate 4 RPS:
 
 ```sh
 $ watch -n1 ./trigger-4.sh
 ```
 
-The throughput will then approach 5 requests per second. Once the total RPS over two minutes passes the 2 RPS threshold you'll see a message displayed.
+The throughput will then approach 5 requests per second. Once the total RPS over two minutes passes the 2 RPS threshold you'll see a message displayed. It'll repeat each time the stats are redrawn.
 
-Once the message has been displayed, kill the 4 RPS generator, and after enough time passes a message will be displayed that the high RPS threshold is no longer surpassed.
+Once the message has been displayed, kill the 4 RPS generator, and after enough time passes a single message will be displayed that the high RPS threshold is no longer surpassed.
 
 
-## Output
+## Sample Output
+
+Here's some example output from a test session:
 
 ```
 High traffic generated an alert - hits = 246 (2.0 r/s), triggered at 9:34:49 PM
@@ -109,11 +111,12 @@ Hosts:
 
 ## Improvements
 
-I would make the following improvements if this were a production application:
+I would make the following improvements if this were a production-worthy application:
 
-- The output is ugly and space inefficient. Since this is a terminal application I'd switch to something like `ncurses` to draw output to specified coordinates.
+- The output is ugly and space inefficient. The app currently displays all global statistics and last-batch statistics. Since this is a terminal application I'd switch to something like `ncurses` to draw output to specified coordinates.
 
-- When the access log changes the entire different is loaded into memory. So if 1MB of data is added every 10 seconds to a 100MB log file, this reads in the new 1MB of data all at once. Ideally I would specify a maximum buffer size, perhaps 100KB, and continuously read the file difference into the buffer, calculating the statistics and discarding the lines. This would keep memory usage from jumping so much.
+- When the access log changes the entire different is loaded into memory. So if 1MB of data is added every 10 seconds to a 100MB log file, this reads in the new 1MB of data all at once (note: not the whole log file). Ideally the app would specify a maximum buffer size, perhaps 100KB, and continuously read the file difference into the buffer, calculating the aggregate statistics. This would keep memory usage from jumping so much.
 
-- The code assumes at least one visit happens during the 10 second polling window. To make this more resilient I would move the display logic into a method called via `setInterval(fn, 10000)`. I would also set the `fs.watchFile()` interval to a lower value, perhaps 1 second.
+- The code assumes at least one visit happens during the 10 second polling window. To make this more resilient it would move the display logic into a method called via `setInterval(fn, 10000)`. I would also set the `fs.watchFile()` interval to a lower value, perhaps 1 second.
 
+- If I anticipated much community interest I'd add a linter which runs with the tests, run tests when PRs are received, and provide contributor guidelines.

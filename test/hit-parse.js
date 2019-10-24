@@ -2,8 +2,9 @@
 
 'use strict';
 
-const Hit = require('../hit.js');
 const test = require('tape');
+
+const Hit = require('../lib/hit.js');
 
 test('basic hit parsing', (t) => {
   const hit = new Hit('127.0.0.1 - jill [09/May/2018:16:00:41 +0000] "GET /api/user HTTP/1.0" 200 234');
