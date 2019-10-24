@@ -21,44 +21,44 @@ class Statistics {
     this.hosts = new Map();
   }
 
-  track(line/*: Line*/) {
+  track(hit/*: Hit*/) {
     this.total++;
-    this.bytes += line.bytes;
+    this.bytes += hit.bytes;
 
-    if (line.status >= 400) {
+    if (hit.status >= 400) {
       this.failures++;
     }
 
-    if (line.request_method in this.methods) {
-      this.methods[line.request_method]++;
+    if (hit.request_method in this.methods) {
+      this.methods[hit.request_method]++;
     } else {
-      console.error(`UNKNOWN METHOD: ${line.request_method}`);
+      console.error(`UNKNOWN METHOD: ${hit.request_method}`);
     }
 
-    if (!this.sections.has(line.request_section)) {
-      this.sections.set(line.request_section, 1);
+    if (!this.sections.has(hit.request_section)) {
+      this.sections.set(hit.request_section, 1);
     } else {
       this.sections.set(
-        line.request_section,
-        this.sections.get(line.request_section) + 1
+        hit.request_section,
+        this.sections.get(hit.request_section) + 1
       );
     }
 
-    if (!this.users.has(line.authuser)) {
-      this.users.set(line.authuser, 1);
+    if (!this.users.has(hit.authuser)) {
+      this.users.set(hit.authuser, 1);
     } else {
       this.users.set(
-        line.authuser,
-        this.users.get(line.authuser) + 1
+        hit.authuser,
+        this.users.get(hit.authuser) + 1
       );
     }
 
-    if (!this.hosts.has(line.remotehost)) {
-      this.hosts.set(line.remotehost, 1);
+    if (!this.hosts.has(hit.remotehost)) {
+      this.hosts.set(hit.remotehost, 1);
     } else {
       this.hosts.set(
-        line.remotehost,
-        this.hosts.get(line.remotehost) + 1
+        hit.remotehost,
+        this.hosts.get(hit.remotehost) + 1
       );
     }
   }

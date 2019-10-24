@@ -16,6 +16,7 @@ The arguments are both optional.
 To test, run the following:
 
 ```sh
+$ npm install
 $ npm test
 ```
 
@@ -115,3 +116,4 @@ I would make the following improvements if this were a production application:
 - When the access log changes the entire different is loaded into memory. So if 1MB of data is added every 10 seconds to a 100MB log file, this reads in the new 1MB of data all at once. Ideally I would specify a maximum buffer size, perhaps 100KB, and continuously read the file difference into the buffer, calculating the statistics and discarding the lines. This would keep memory usage from jumping so much.
 
 - The code assumes at least one visit happens during the 10 second polling window. To make this more resilient I would move the display logic into a method called via `setInterval(fn, 10000)`. I would also set the `fs.watchFile()` interval to a lower value, perhaps 1 second.
+

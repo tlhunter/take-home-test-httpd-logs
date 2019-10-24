@@ -1,12 +1,16 @@
 {
-  "name": "data-dog",
+  "name": "w3c-httpd-tail",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "Tails logs adhering to the W3C httpd logging format",
+  "main": "main.js",
   "scripts": {
-    "test": "./test/runner.sh"
+    "test": "./test/runner.sh | tap-spec"
   },
   "keywords": [],
-  "author": "",
-  "license": "ISC"
+  "author": "Thomas Hunter II <me@thomashunter.name>",
+  "license": "BSD-2-Clause",
+  "devDependencies": {
+    "tap-spec": "^5.0.0",
+    "tape": "^4.11.0"
+  }
 }

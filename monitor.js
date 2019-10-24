@@ -3,7 +3,7 @@
 const fs = require('fs');
 
 const Statistics = require('./statistics.js');
-const Line = require('./line.js');
+const Hit = require('./hit.js');
 
 const DEFAULT_THRESHOLD_RPS = 10;
 const DEFAULT_LOG_PATH = '/tmp/access.log';
@@ -72,12 +72,12 @@ class Monitor {
       const batch = new Statistics();
 
       for (let hit of hits) {
-        const line = new Line(hit);
-        this.#global_stats.track(line);
-        batch.track(line);
+        hit = new Hit(hit);
+        this.#global_stats.track(hit);
+        batch.track(hit);
       }
 
-      this._checkAlerts(hits.length);
+      console.log(this._checkAlerts(hits.length));
 
       this.#global_stats.print('Global');
       batch.print('Batch');
@@ -90,7 +90,7 @@ class Monitor {
       return;
     }
 
-    this.#watcher.close();
+    fs.unwatchFile(this.#log_path, this.#watcher);
     this.#watcher = null;
 
     this.#alert_mode = false;
@@ -104,6 +104,8 @@ class Monitor {
   }
 
   _checkAlerts(alert_count) {
+    let response = '';
+
     if (this.#alert_ring_cursor >= this.#alert_ring_buffer.length) {
       this.#alert_ring_cursor = 0;
     }
@@ -117,11 +119,13 @@ class Monitor {
 
     if (rps > this.#threshold_rps) {
       this.#alert_mode = true;
-      console.log(`${COLOR_RED}High traffic generated an alert - hits = ${recent_hits} (${rps.toFixed(1)} r/s), triggered at ${(new Date()).toLocaleTimeString()}${COLOR_RESET}`);
+      response += `${COLOR_RED}High traffic generated an alert - hits = ${recent_hits} (${rps.toFixed(1)} r/s), triggered at ${(new Date()).toLocaleTimeString()}${COLOR_RESET}\n`;
     } else if (this.#alert_mode) {
       this.#alert_mode = false;
-      console.log(`${COLOR_CYAN}High traffic has passed${COLOR_RESET}`);
+      response += `${COLOR_CYAN}High traffic has passed${COLOR_RESET}`;
     }
+
+    return response;
   }
 }
 

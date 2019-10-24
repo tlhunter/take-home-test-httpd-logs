@@ -2,58 +2,28 @@
 
 'use strict';
 
-const Monitor = require('../monitor.js');
-const assert = require('assert');
+const test = require('tape');
 
-const messages = [];
+const Monitor = require('../monitor.js');
 
 const monitor = new Monitor({
   threshold_rps: 3
 });
 
-stub();
+test('test high traffic alert threshold', (t) => {
+  for (let i = 0; i < 12; i++) {
+    // _checkAlerts() is called every 10 seconds
+    // so we send 30 alerts to average 3 per second
+    t.equal(monitor._checkAlerts(30), '', 'no alerts as we approach RPS threshold');
+  }
 
-// This will set the RPS to exactly three
-for (let i = 0; i < 12; i++) {
-  // _checkAlerts() is called every 10 seconds
-  // so we send 30 alerts to average 3 per second
-  monitor._checkAlerts(30);
-}
+  t.equal(monitor._checkAlerts(30), '', 'no messages even after rollover');
 
-assert.strictEqual(messages.length, 0);
+  t.ok(monitor._checkAlerts(31).includes('High traffic generated an alert'), 'alert was given');
 
-// Should still be three
-monitor._checkAlerts(30);
+  t.ok(monitor._checkAlerts(1).includes('High traffic has passed'), 'alert went away');
 
-assert.strictEqual(messages.length, 0);
+  t.equal(monitor._checkAlerts(1), '', 'still low traffic');
 
-// Should now be slightly over three
-monitor._checkAlerts(31);
-
-assert.strictEqual(messages.length, 1);
-assert.ok(messages[0].includes('High traffic generated an alert'));
-
-// Should now be below threshold
-monitor._checkAlerts(1);
-
-assert.strictEqual(messages.length, 2);
-assert.ok(messages[1].includes('High traffic has passed'));
-
-// Still below threshold, but won't make a new message
-monitor._checkAlerts(1);
-
-assert.strictEqual(messages.length, 2);
-
-// restore();
-
-function stub() {
-  global.CONSOLE_LOG_BACKUP = global.console.log;
-  global.console.log = (message) => {
-    messages.push(message);
-  };
-}
-
-function restore() {
-  global.console.log = global.CONSOLE_LOG_BACKUP;
-  delete global.CONSOLE_LOG_BACKUP;
-}
+  t.end();
+});
