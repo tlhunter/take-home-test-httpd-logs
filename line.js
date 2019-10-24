@@ -66,7 +66,7 @@ class Line {
       this.request = line.substr(cursor_l + 1, cursor_r - cursor_l - 1);
       const method_path_separator = this.request.indexOf(' ');
 
-      this.request_method = this.request.substr(0, method_path_separator);
+      this.request_method = this.request.substr(0, method_path_separator).toUpperCase();
 
       this.request_path = this.request.substr(
         method_path_separator + 1,

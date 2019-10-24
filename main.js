@@ -3,11 +3,18 @@
 const Monitor = require('./monitor.js');
 
 const monitor = new Monitor({
-  threshold_rps: 20,
-  log_path: './access.log'
+  threshold_rps: process.argv[3],
+  log_path: process.argv[2]
 });
 
-
 console.log(monitor);
-process.exit();
 
+monitor.start((err) => {
+  if (err) {
+    console.error(err);
+    process.exit(1);
+    return;
+  }
+
+  console.log('running...');
+});
